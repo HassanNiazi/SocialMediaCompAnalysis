@@ -15,7 +15,7 @@
         - Goal: Inform (High-Level): Report Info (Executive Summary, Key Trends) -> Presentation (Styled text blocks, summary cards with icons) -> Interaction (None) -> Justification (Provides immediate context and key takeaways upon loading) -> Method (HTML/Tailwind).
         - Goal: Compare (Competitors): Report Info (Competitor features, pricing, stats) -> Presentation (Dynamic content area with cards for metrics, a feature grid, and pricing table) -> Interaction (User clicks a competitor's button to update the view) -> Justification (Allows for easy one-to-one comparison without clutter) -> Method (JS DOM manipulation).
         - Goal: Compare (Financials/Users): Report Info (Revenue, Funding, User Base data across all competitors) -> Presentation (Bar charts) -> Interaction (Tooltips on hover for precise data) -> Justification (Bar charts are ideal for direct quantitative comparison across multiple entities) -> Library (Chart.js/Canvas).
-        - Goal: Synthesize (Strategy): Report Info (Report's conclusions and recommendations) -> Presentation (Accordion-style collapsible sections) -> Interaction (User clicks to expand/collapse strategic points) -> Justification (Organizes complex recommendations into digestible themes, allowing the user to focus on one area at a time) -> Method (HTML/JS).
+        - Goal: Synthesize (Strategy): Report Info (Report's conclusions and recommendations) -> Presentation (Accordion-style collapsible collapsible sections) -> Interaction (User clicks to expand/collapse strategic points) -> Justification (Organizes complex recommendations into digestible themes, allowing the user to focus on one area at a time) -> Method (HTML/JS).
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -34,7 +34,7 @@
     <div id="app" class="container mx-auto p-4 sm:p-6 lg:p-8">
         
         <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Market Research Report</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Market Research Report/h1>
             <p class="text-lg text-slate-600 mt-2">Multi-Platform Content Uploading Solutions</p>
         </header>
 
@@ -214,15 +214,15 @@
                     revenue: null,
                     funding: null,
                     users: null,
-                    price: 25, // Updated price to reflect Starter plan monthly cost
+                    price: 25, 
                     features: { 'AI Assistant': false, 'Social Listening': false, 'Advanced Analytics': false, 'Team Collaboration': true, 'Freemium Plan': true, 'Integrations': false },
                      pricingTiers: [
                         { name: 'Free', price: '$0/mo' },
                         { name: 'Starter', price: '$25/mo' },
                         { name: 'Growth', price: '$45/mo' },
                         { name: 'Advanced', price: '$80/mo' },
-                        { name: 'Agency', price: '$133.33/mo' }, // Added Agency plan
-                        { name: 'Enterprise', price: 'Custom' } // Added Enterprise plan
+                        { name: 'Agency', price: '$133.33/mo' }, 
+                        { name: 'Enterprise', price: 'Custom' } 
                     ]
                 },
                 Sendible: {
@@ -240,8 +240,8 @@
                 },
                 Agorapulse: {
                     description: 'A platform emphasizing intuitive design, robust features, and strong customer support to drive real business impact.',
-                    revenue: 35, // Updated revenue based on research
-                    funding: 18.3, // Updated funding based on research
+                    revenue: 35, 
+                    funding: 18.3, 
                     users: 11000,
                     price: 79,
                     features: { 'AI Assistant': true, 'Social Listening': true, 'Advanced Analytics': true, 'Team Collaboration': true, 'Freemium Plan': true, 'Integrations': true },
@@ -249,8 +249,36 @@
                         { name: 'Free', price: '$0/mo' },
                         { name: 'Standard', price: '$79/mo' },
                         { name: 'Professional', price: '$119/mo' },
-                        { name: 'Advanced', price: '$149/mo' }, // Added Advanced plan based on research
-                        { name: 'Enterprise', price: 'Custom' } // Added Enterprise plan based on research
+                        { name: 'Advanced', price: '$149/mo' }, 
+                        { name: 'Enterprise', price: 'Custom' } 
+                    ]
+                },
+                'Post-Bridge': {
+                    description: 'A specialized application primarily designed to facilitate the integration of WordPress blogs into Shopify stores. It also offers social media management features like scheduling, multi-user collaboration, and analytics, with a notable feature for TikTok Carousel posts with trending audio. The landing page claims over 7000 users across all platforms.',
+                    revenue: 1.26, 
+                    funding: 0, 
+                    users: 7000, 
+                    price: 7.50,
+                    features: { 'AI Assistant': false, 'Social Listening': false, 'Advanced Analytics': true, 'Team Collaboration': true, 'Freemium Plan': true, 'Integrations': true }, // Updated to true
+                     pricingTiers: [
+                        { name: 'Free', price: '$0/mo' }, // Added free tier
+                        { name: 'Starter', price: '$7.50/mo' },
+                        { name: 'Creator', price: '$15.00/mo' },
+                        { name: 'Pro', price: '$22.50/mo' }
+                    ]
+                },
+                'Upload-Post': {
+                    description: 'An API for uploading videos to TikTok, Instagram, LinkedIn, Youtube & more, focusing on programmatic content distribution. Their landing page states "Trusted by 3,751+ active users."',
+                    revenue: 0.675, 
+                    funding: null, 
+                    users: 3751, 
+                    price: 15, 
+                    features: { 'AI Assistant': false, 'Social Listening': false, 'Advanced Analytics': false, 'Team Collaboration': false, 'Freemium Plan': true, 'Integrations': true },
+                     pricingTiers: [
+                        { name: 'Free', price: '€0/mo (10 uploads/month)' },
+                        { name: 'Basic', price: '€14/mo (120 uploads/month)' },
+                        { name: 'Professional', price: '€42/mo (unlimited uploads)' },
+                        { name: 'Advanced', price: '€126/mo (unlimited uploads)' }
                     ]
                 }
             };
@@ -276,14 +304,19 @@
                 }
                 
                 let pricingHTML = '';
-                data.pricingTiers.forEach(tier => {
-                    pricingHTML += `
-                        <div class="border border-slate-200 rounded-lg p-4 text-center">
-                            <p class="font-semibold text-slate-700">${tier.name}</p>
-                            <p class="text-blue-600 font-bold text-xl mt-1">${tier.price}</p>
-                        </div>
-                    `;
-                });
+                if (data.pricingTiers && data.pricingTiers.length > 0) {
+                    data.pricingTiers.forEach(tier => {
+                        pricingHTML += `
+                            <div class="border border-slate-200 rounded-lg p-4 text-center">
+                                <p class="font-semibold text-slate-700">${tier.name}</p>
+                                <p class="text-blue-600 font-bold text-xl mt-1">${tier.price}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    pricingHTML = '<p class="text-slate-500">Pricing details not available.</p>';
+                }
+
 
                 detailsContainer.innerHTML = `
                     <div class="grid md:grid-cols-3 gap-8">
@@ -320,7 +353,7 @@
                 `;
             }
 
-            let firstCompetitorButton = null; // Variable to hold the reference to the first button
+            let firstCompetitorButton = null; 
 
             competitors.forEach((name, index) => {
                 const button = document.createElement('button');
@@ -334,16 +367,14 @@
                 deepDiveContainer.appendChild(button);
 
                 if (index === 0) {
-                    firstCompetitorButton = button; // Capture the first button created
+                    firstCompetitorButton = button; 
                 }
             });
             
-            // Activate the first button and display its details if it exists
             if (firstCompetitorButton) {
                 firstCompetitorButton.classList.add('active');
                 updateCompetitorDetails(competitors[0]);
             } else {
-                // Handle case where no competitors are found (though data is hardcoded to exist)
                 detailsContainer.innerHTML = '<p class="text-center text-slate-500 mt-16">No competitor data available to display.</p>';
             }
 
@@ -391,14 +422,14 @@
             let charts = {};
             function initCharts() {
                 const chartData = {
-                    labels: competitors.filter(c => competitorData[c].revenue),
-                    revenues: competitors.map(c => competitorData[c].revenue).filter(Boolean),
-                    fundings: competitors.map(c => competitorData[c].funding).filter(c => c !== null),
+                    labels: competitors.filter(c => competitorData[c].revenue !== null), 
+                    revenues: competitors.map(c => competitorData[c].revenue).filter(r => r !== null),
+                    fundings: competitors.map(c => competitorData[c].funding).filter(f => f !== null),
                     fundingLabels: competitors.filter(c => competitorData[c].funding !== null),
-                    users: competitors.map(c => competitorData[c].users).filter(Boolean),
-                    userLabels: competitors.filter(c => competitorData[c].users),
-                    prices: competitors.map(c => competitorData[c].price).filter(Boolean),
-                    priceLabels: competitors.filter(c => competitorData[c].price),
+                    users: competitors.map(c => competitorData[c].users).filter(u => u !== null),
+                    userLabels: competitors.filter(c => competitorData[c].users !== null),
+                    prices: competitors.map(c => competitorData[c].price).filter(p => p !== null),
+                    priceLabels: competitors.filter(c => competitorData[c].price !== null),
                 };
 
                 const chartOptions = (title, unit) => ({
@@ -482,9 +513,10 @@
                                 ...chartOptions('Number of Customers', '').scales.y,
                                 ticks: {
                                     callback: function(value, index, values) {
-                                        if (value === 1 || value === 10 || value === 100 || value === 1000 || value === 10000 || value === 100000 || value === 1000000 || value === 10000000 || value === 100000000) { // Only show specific log ticks
+                                        if (value === 1 || value === 10 || value === 100 || value === 1000 || value === 10000 || value === 100000 || value === 1000000 || value === 10000000 || value === 100000000) { 
                                             return formatNumber(value);
                                         }
+                                        return null; 
                                     },
                                     color: '#64748b'
                                 }
