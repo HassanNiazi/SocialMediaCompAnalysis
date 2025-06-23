@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Competitor Analysis: Content Uploading Platforms</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Corporate -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive dashboard with four main sections accessible via a sticky top navigation: 'Market Overview', 'Competitor Deep Dive', 'Financial & User Metrics', and 'Strategic Insights'. This structure was chosen to guide the user from a high-level summary to specific data points and finally to actionable conclusions. The 'Competitor Deep Dive' uses a tab-based interaction model, allowing users to select a single competitor and view all related data in one consolidated, dynamic view. This prevents information overload and facilitates direct, focused analysis, which is more effective for usability than a long scrolling page or multiple separate pages. -->
+    <!-- Visualization & Content Choices: 
+        - Goal: Inform (High-Level): Report Info (Executive Summary, Key Trends) -> Presentation (Styled text blocks, summary cards with icons) -> Interaction (None) -> Justification (Provides immediate context and key takeaways upon loading) -> Method (HTML/Tailwind).
+        - Goal: Compare (Competitors): Report Info (Competitor features, pricing, stats) -> Presentation (Dynamic content area with cards for metrics, a feature grid, and pricing table) -> Interaction (User clicks a competitor's button to update the view) -> Justification (Allows for easy one-to-one comparison without clutter) -> Method (JS DOM manipulation).
+        - Goal: Compare (Financials/Users): Report Info (Revenue, Funding, User Base data across all competitors) -> Presentation (Bar charts) -> Interaction (Tooltips on hover for precise data) -> Justification (Bar charts are ideal for direct quantitative comparison across multiple entities) -> Library (Chart.js/Canvas).
+        - Goal: Synthesize (Strategy): Report Info (Report's conclusions and recommendations) -> Presentation (Accordion-style collapsible sections) -> Interaction (User clicks to expand/collapse strategic points) -> Justification (Organizes complex recommendations into digestible themes, allowing the user to focus on one area at a time) -> Method (HTML/JS).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 400px; max-height: 50vh; }
+        .nav-btn { transition: all 0.3s ease; }
+        .nav-btn.active { color: #2563EB; border-bottom-color: #2563EB; font-weight: 600; }
+        .competitor-btn.active { background-color: #2563EB; color: white; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div id="app" class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Competitive Landscape</h1>
+            <p class="text-lg text-slate-600 mt-2">Multi-Platform Content Uploading Solutions</p>
+        </header>
+
+        <nav class="sticky top-0 bg-slate-50/80 backdrop-blur-sm z-10 border-b border-slate-200 mb-8">
+            <div class="flex justify-center items-center space-x-4 sm:space-x-8 text-sm sm:text-base">
+                <button data-target="overview" class="nav-btn p-4 border-b-2 border-transparent text-slate-600 hover:text-blue-600 active">Market Overview</button>
+                <button data-target="deep-dive" class="nav-btn p-4 border-b-2 border-transparent text-slate-600 hover:text-blue-600">Competitor Deep Dive</button>
+                <button data-target="metrics" class="nav-btn p-4 border-b-2 border-transparent text-slate-600 hover:text-blue-600">Financial & User Metrics</button>
+                <button data-target="strategy" class="nav-btn p-4 border-b-2 border-transparent text-slate-600 hover:text-blue-600">Strategic Insights</button>
+            </div>
+        </nav>
+
+        <main>
+            <section id="overview" class="content-section active">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-900">Executive Summary</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        This interactive dashboard analyzes the multi-platform content uploading landscape. The market is robust, dominated by mature social media management platforms offering extensive scheduling, analytics, and collaboration tools. The broader competitive landscape reveals a strong emphasis on user experience, AI-driven content creation, comprehensive analytics, and seamless integrations across a wide array of social networks. Understanding these dynamics is paramount for identifying opportunities for differentiation and successful market entry. Use the navigation above to explore the competitive set, compare financial metrics, and uncover strategic insights.
+                    </p>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-2xl font-bold mb-4 text-center text-slate-900">Key Market Trends</h3>
+                    <div class="grid md:grid-cols-3 gap-6 text-center">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <div class="text-3xl mb-3">🤖</div>
+                            <h4 class="font-semibold text-lg">AI-Powered Features</h4>
+                            <p class="text-slate-600 text-sm mt-1">AI assistance for content generation, scheduling optimization, and sentiment analysis is becoming a standard expectation and a key differentiator.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <div class="text-3xl mb-3">🎯</div>
+                            <h4 class="font-semibold text-lg">Niche Specialization</h4>
+                            <p class="text-slate-600 text-sm mt-1">Opportunities exist in serving specific niches, such as focusing on visual content (Later) or unique integrations (Post-Bridge for Shopify).</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <div class="text-3xl mb-3">✨</div>
+                            <h4 class="font-semibold text-lg">Superior User Experience (UX)</h4>
+                            <p class="text-slate-600 text-sm mt-1">Even in a crowded market, a truly exceptional and intuitive user interface that simplifies complex tasks can be a significant competitive advantage.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="deep-dive" class="content-section">
+                <div class="text-center mb-8">
+                     <h2 class="text-2xl font-bold mb-2 text-slate-900">Competitor Deep Dive</h2>
+                     <p class="text-slate-600 max-w-2xl mx-auto">Select a competitor to see a detailed breakdown of their offerings, key metrics, and features. This section allows for a focused, one-to-one analysis of each player in the market.</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-2 mb-8">
+                </div>
+                <div id="competitor-details" class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 min-h-[500px]">
+                </div>
+            </section>
+
+            <section id="metrics" class="content-section">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold mb-2 text-slate-900">Financial & User Metrics</h2>
+                    <p class="text-slate-600 max-w-2xl mx-auto">These charts provide a comparative view of key business metrics across the major competitors. Hover over the bars to see precise values and compare performance in revenue, funding, and user base.</p>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <h3 class="text-xl font-semibold mb-4 text-center">Annual Recurring Revenue (ARR)</h3>
+                        <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <h3 class="text-xl font-semibold mb-4 text-center">Total Funding Raised</h3>
+                        <div class="chart-container"><canvas id="fundingChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <h3 class="text-xl font-semibold mb-4 text-center">Customer Base</h3>
+                        <div class="chart-container"><canvas id="usersChart"></canvas></div>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <h3 class="text-xl font-semibold mb-4 text-center">Starting Price (Monthly)</h3>
+                        <div class="chart-container"><canvas id="priceChart"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="strategy" class="content-section">
+                 <div class="text-center mb-8">
+                     <h2 class="text-2xl font-bold mb-2 text-slate-900">Strategic Insights & Opportunities</h2>
+                     <p class="text-slate-600 max-w-2xl mx-auto">This section synthesizes the report's conclusions into actionable strategies for a new product. Click on each theme to expand and explore key takeaways and recommendations for successful market entry.</p>
+                </div>
+                <div class="max-w-4xl mx-auto space-y-4">
+                    <div class="accordion-item bg-white rounded-xl border border-slate-100 shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-5 text-left font-semibold text-lg">
+                            <span>Key Market Takeaways</span>
+                            <span class="accordion-icon text-2xl font-light transform transition-transform">+</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-5 pt-0 text-slate-600 space-y-2">
+                                <p><strong>Market Dominance:</strong> Major players offer extensive features, including scheduling, analytics, social listening, and collaboration, catering to diverse business sizes.</p>
+                                <p><strong>Pricing Models:</strong> A mix of freemium, per-channel/per-user, and enterprise custom pricing is prevalent. Freemium models are effective for user acquisition.</p>
+                                <p><strong>Feature Evolution:</strong> AI-driven content creation, advanced analytics, and seamless integrations are becoming standard expectations, pushing innovation.</p>
+                                <p><strong>User Experience is King:</strong> Simplicity and intuitive design remain critical for user satisfaction and retention across all segments.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-xl border border-slate-100 shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-5 text-left font-semibold text-lg">
+                            <span>Opportunities for a New Product</span>
+                             <span class="accordion-icon text-2xl font-light transform transition-transform">+</span>
+                        </button>
+                        <div class="accordion-content">
+                             <div class="p-5 pt-0 text-slate-600 space-y-2">
+                                <p><strong>Hyper-Specialization:</strong> Focus on a specific content format (e.g., short-form video), a niche industry, or a unique platform combination not well-served by larger platforms.</p>
+                                <p><strong>Unrivaled Ease of Use:</strong> Develop an exceptionally intuitive interface that simplifies complex multi-platform workflows, appealing to non-technical users.</p>
+                                 <p><strong>Developer-First API:</strong> Build a highly robust, well-documented, and performant API with unique functionalities to attract developers and enterprise clients who need custom solutions.</p>
+                                 <p><strong>Cost-Effectiveness:</strong> Offer a highly competitive price point for a well-defined set of features targeting micro-businesses or emerging markets.</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="accordion-item bg-white rounded-xl border border-slate-100 shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-5 text-left font-semibold text-lg">
+                            <span>Core Strategic Recommendations</span>
+                             <span class="accordion-icon text-2xl font-light transform transition-transform">+</span>
+                        </button>
+                        <div class="accordion-content">
+                             <div class="p-5 pt-0 text-slate-600 space-y-2">
+                               <p><strong>1. Define a Clear Niche:</strong> Don't compete with giants on all fronts. Identify an underserved segment and build the best solution for them.</p>
+                               <p><strong>2. Build a Strategic Feature Set:</strong> Ensure seamless core functionality but prioritize AI integration, robust third-party integrations (e.g., Canva), and efficient collaboration tools.</p>
+                               <p><strong>3. Use Flexible & Transparent Pricing:</strong> A compelling freemium tier is key for adoption. Paid plans should be scalable and clearly demonstrate value for money.</p>
+                               <p><strong>4. Emphasize Reliability & Support:</strong> High post success rates and responsive customer support build trust and drive long-term retention in a mission-critical service.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const competitorData = {
+                Buffer: {
+                    description: 'A well-established platform known for its simplicity and intuitive user interface, catering to small businesses and creators.',
+                    revenue: 18.8,
+                    funding: 4.07,
+                    users: 70000,
+                    price: 6,
+                    features: { 'AI Assistant': true, 'Social Listening': false, 'Advanced Analytics': true, 'Team Collaboration': true, 'Freemium Plan': true, 'Integrations': true },
+                    pricingTiers: [
+                        { name: 'Free', price: '$0/mo' },
+                        { name: 'Essentials', price: '$6/mo/channel' },
+                        { name: 'Team', price: '$12/mo/channel' }
+                    ]
+                },
+                Hootsuite: {
+                    description: 'A mature, comprehensive platform for large teams and enterprises, offering an all-in-one solution for social media marketing.',
+                    revenue: 350,
+                    funding: 284.9,
+                    users: 18000000,
+                    price: 99,
+                    features: { 'AI Assistant': true, 'Social Listening': true, 'Advanced Analytics': true, 'Team Collaboration': true, 'Freemium Plan': false, 'Integrations': true },
+                     pricingTiers: [
+                        { name: 'Professional', price: '$99/mo' },
+                        { name: 'Team', price: '$249/mo' },
+                        { name: 'Enterprise', price: 'Custom' }
+                    ]
+                },
+                'Sprout Social': {
+                    description: 'A robust, all-in-one platform targeting enterprises and agencies, focusing on driving measurable business impact from social media.',
+                    revenue: 450, 
+                    funding: 0, 
+                    users: 30000,
+                    price: 199,
+                    features: { 'AI Assistant': true, 'Social Listening': true, 'Advanced Analytics': true, 'Team Collaboration': true, 'Freemium Plan': false, 'Integrations': true },
+                     pricingTiers: [
+                        { name: 'Standard', price: '$199/mo/seat' },
+                        { name: 'Professional', price: '$299/mo/seat' },
+                        { name: 'Advanced', price: '$399/mo/seat' }
+                    ]
+                },
+                Later: {
+                    description: 'A scheduling tool tailored for businesses with a strong focus on visual content and Instagram-first strategies.',
+                    revenue: null,
+                    funding: null,
+                    users: null,
+                    price: 25, // Updated price to reflect Starter plan monthly cost
+                    features: { 'AI Assistant': false, 'Social Listening': false, 'Advanced Analytics': false, 'Team Collaboration': true, 'Freemium Plan': true, 'Integrations': false },
+                     pricingTiers: [
+                        { name: 'Free', price: '$0/mo' },
+                        { name: 'Starter', price: '$25/mo' },
+                        { name: 'Growth', price: '$45/mo' },
+                        { name: 'Advanced', price: '$80/mo' },
+                        { name: 'Agency', price: '$133.33/mo' }, // Added Agency plan
+                        { name: 'Enterprise', price: 'Custom' } // Added Enterprise plan
+                    ]
+                },
+                Sendible: {
+                    description: 'A versatile platform designed for agencies, excelling in streamlining workflows and centralizing client communication.',
+                    revenue: 7.5,
+                    funding: 0,
+                    users: null,
+                    price: 29,
+                    features: { 'AI Assistant': true, 'Social Listening': false, 'Advanced Analytics': true, 'Team Collaboration': true, 'Freemium Plan': false, 'Integrations': true },
+                     pricingTiers: [
+                        { name: 'Creator', price: '$29/mo' },
+                        { name: 'Traction', price: '$89/mo' },
+                        { name: 'Scale', price: '$199/mo' }
+                    ]
+                },
+                Agorapulse: {
+                    description: 'A platform emphasizing intuitive design, robust features, and strong customer support to drive real business impact.',
+                    revenue: 35, // Updated revenue based on research
+                    funding: 18.3, // Updated funding based on research
+                    users: 11000,
+                    price: 79,
+                    features: { 'AI Assistant': true, 'Social Listening': true, 'Advanced Analytics': true, 'Team Collaboration': true, 'Freemium Plan': true, 'Integrations': true },
+                     pricingTiers: [
+                        { name: 'Free', price: '$0/mo' },
+                        { name: 'Standard', price: '$79/mo' },
+                        { name: 'Professional', price: '$119/mo' },
+                        { name: 'Advanced', price: '$149/mo' }, // Added Advanced plan based on research
+                        { name: 'Enterprise', price: 'Custom' } // Added Enterprise plan based on research
+                    ]
+                }
+            };
+            
+            const competitors = Object.keys(competitorData);
+            const deepDiveContainer = document.querySelector('#deep-dive .flex-wrap');
+            const detailsContainer = document.getElementById('competitor-details');
+
+            function formatNumber(num) {
+                if (num === null || num === undefined) return 'N/A';
+                if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
+                if (num >= 1000) return `${(num / 1000).toFixed(0)}k`;
+                return num.toString();
+            }
+
+            function updateCompetitorDetails(name) {
+                const data = competitorData[name];
+                if (!data) return;
+
+                let featuresHTML = '';
+                for (const [feature, available] of Object.entries(data.features)) {
+                    featuresHTML += `<li class="flex items-center text-slate-600"><span class="text-green-500 mr-2">${available ? '✓' : '<span class="text-red-400">×</span>'}</span> ${feature}</li>`;
+                }
+                
+                let pricingHTML = '';
+                data.pricingTiers.forEach(tier => {
+                    pricingHTML += `
+                        <div class="border border-slate-200 rounded-lg p-4 text-center">
+                            <p class="font-semibold text-slate-700">${tier.name}</p>
+                            <p class="text-blue-600 font-bold text-xl mt-1">${tier.price}</p>
+                        </div>
+                    `;
+                });
+
+                detailsContainer.innerHTML = `
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="md:col-span-2">
+                            <h3 class="text-3xl font-bold text-slate-900">${name}</h3>
+                            <p class="mt-2 text-slate-600 leading-relaxed">${data.description}</p>
+                            
+                            <h4 class="font-semibold text-xl mt-8 mb-4">Core Features</h4>
+                            <ul class="grid sm:grid-cols-2 gap-x-6 gap-y-2">
+                                ${featuresHTML}
+                            </ul>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-slate-100 p-4 rounded-lg text-center">
+                                <p class="text-sm font-medium text-slate-500">Est. ARR</p>
+                                <p class="text-2xl font-bold text-slate-800">${data.revenue ? `$${data.revenue}M` : 'N/A'}</p>
+                            </div>
+                            <div class="bg-slate-100 p-4 rounded-lg text-center">
+                                <p class="text-sm font-medium text-slate-500">Total Funding</p>
+                                <p class="text-2xl font-bold text-slate-800">${data.funding ? `$${data.funding}M` : 'N/A'}</p>
+                            </div>
+                            <div class="bg-slate-100 p-4 rounded-lg text-center">
+                                <p class="text-sm font-medium text-slate-500">Customer Base</p>
+                                <p class="text-2xl font-bold text-slate-800">${formatNumber(data.users)}</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="mt-8">
+                        <h4 class="font-semibold text-xl mb-4 text-center">Pricing Plans</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                           ${pricingHTML}
+                        </div>
+                    </div>
+                `;
+            }
+
+            let firstCompetitorButton = null; // Variable to hold the reference to the first button
+
+            competitors.forEach((name, index) => {
+                const button = document.createElement('button');
+                button.textContent = name;
+                button.className = 'competitor-btn px-4 py-2 text-sm font-medium rounded-full bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition';
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.competitor-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    updateCompetitorDetails(name);
+                });
+                deepDiveContainer.appendChild(button);
+
+                if (index === 0) {
+                    firstCompetitorButton = button; // Capture the first button created
+                }
+            });
+            
+            // Activate the first button and display its details if it exists
+            if (firstCompetitorButton) {
+                firstCompetitorButton.classList.add('active');
+                updateCompetitorDetails(competitors[0]);
+            } else {
+                // Handle case where no competitors are found (though data is hardcoded to exist)
+                detailsContainer.innerHTML = '<p class="text-center text-slate-500 mt-16">No competitor data available to display.</p>';
+            }
+
+
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const sections = document.querySelectorAll('.content-section');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    sections.forEach(section => {
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                            if(targetId === 'metrics') initCharts();
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                });
+            });
+            
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                const icon = item.querySelector('.accordion-icon');
+                header.addEventListener('click', () => {
+                    const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+                    if (isOpen) {
+                        content.style.maxHeight = '0px';
+                        icon.textContent = '+';
+                        icon.classList.remove('rotate-45');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.textContent = '+';
+                        icon.classList.add('rotate-45');
+                    }
+                });
+            });
+
+            let charts = {};
+            function initCharts() {
+                const chartData = {
+                    labels: competitors.filter(c => competitorData[c].revenue),
+                    revenues: competitors.map(c => competitorData[c].revenue).filter(Boolean),
+                    fundings: competitors.map(c => competitorData[c].funding).filter(c => c !== null),
+                    fundingLabels: competitors.filter(c => competitorData[c].funding !== null),
+                    users: competitors.map(c => competitorData[c].users).filter(Boolean),
+                    userLabels: competitors.filter(c => competitorData[c].users),
+                    prices: competitors.map(c => competitorData[c].price).filter(Boolean),
+                    priceLabels: competitors.filter(c => competitorData[c].price),
+                };
+
+                const chartOptions = (title, unit) => ({
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y} ${unit}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#64748b' },
+                            grid: { color: '#e2e8f0' },
+                            title: { display: true, text: title, color: '#334155' }
+                        },
+                        x: {
+                            ticks: { color: '#64748b' },
+                            grid: { display: false }
+                        }
+                    }
+                });
+                
+                // Destroy existing charts before re-creating
+                if (charts.revenue) charts.revenue.destroy();
+                charts.revenue = new Chart(document.getElementById('revenueChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            label: 'ARR',
+                            data: chartData.revenues,
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: chartOptions('Revenue in USD Millions', '$M')
+                });
+
+                if (charts.funding) charts.funding.destroy();
+                charts.funding = new Chart(document.getElementById('fundingChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.fundingLabels,
+                        datasets: [{
+                            label: 'Funding',
+                            data: chartData.fundings,
+                            backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: chartOptions('Funding in USD Millions', '$M')
+                });
+                
+                if (charts.users) charts.users.destroy();
+                charts.users = new Chart(document.getElementById('usersChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.userLabels,
+                        datasets: [{
+                            label: 'Customers',
+                            data: chartData.users,
+                            backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { 
+                        ...chartOptions('Number of Customers', ''), 
+                        scales: { 
+                            y: { 
+                                type: 'logarithmic', 
+                                ...chartOptions('Number of Customers', '').scales.y,
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        if (value === 1 || value === 10 || value === 100 || value === 1000 || value === 10000 || value === 100000 || value === 1000000 || value === 10000000 || value === 100000000) { // Only show specific log ticks
+                                            return formatNumber(value);
+                                        }
+                                    },
+                                    color: '#64748b'
+                                }
+                            } 
+                        } 
+                    }
+                });
+
+                if (charts.price) charts.price.destroy();
+                 charts.price = new Chart(document.getElementById('priceChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.priceLabels,
+                        datasets: [{
+                            label: 'Starting Price',
+                            data: chartData.prices,
+                            backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: chartOptions('Monthly Price in USD', '$')
+                });
+
+            }
+        });
+    </script>
+
+</body>
+</html>
